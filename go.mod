@@ -39,6 +39,7 @@ require (
 
 require (
 	github.com/docker/docker v28.3.3+incompatible
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/jackc/pgx/v5 v5.7.6
