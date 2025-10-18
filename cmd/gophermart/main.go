@@ -35,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Storage (один для всех, реализует мелкие интерфейсы)
+	// Storage
 	storage := gmstorage.NewPostgresStorage(db.DB)
 
 	// Auth
@@ -44,7 +44,7 @@ func main() {
 	// Services (UserService для register)
 	userService := gmservice.NewUserService(storage, auth)
 
-	// Router (chi для удобства)
+	// Router
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
