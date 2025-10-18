@@ -50,11 +50,3 @@ func (d *Database) Close() error {
 	}
 	return nil
 }
-
-func (d *Database) CreateUser(login, passwordHash string) (int64, error) {
-	query := `
-		INSERT INTO users (login, password_hash)
-		VALUES ($1, $2)
-		RETURNING id
-	`
-}

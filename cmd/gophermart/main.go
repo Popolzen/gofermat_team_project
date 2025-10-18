@@ -20,4 +20,8 @@ func main() {
 	if err != nil {
 		fmt.Print(err)
 	}
+
+	// db.CreateUser(context.Background(), "qwe", "zxcbwd")
+	// user, err := db.GetUserByLogin(context.Background(), "qwe")
+	// fmt.Print(user, err)
 }
