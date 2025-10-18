@@ -38,7 +38,7 @@ func (a Auth) AuthMiddleware(next http.Handler) http.Handler {
 
 		// Парсим JWT и проверяем подпись
 		claims := &Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
@@ -50,10 +50,10 @@ func (a Auth) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Шаг 4: Кладём userID в контекст запроса
+		// Кладём userID в контекст запроса
 		ctx := context.WithValue(r.Context(), "userID", claims.UserID)
 
-		// Шаг 5: Передаём управление следующему handler'у
+		// Передаём управление следующему handler
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
