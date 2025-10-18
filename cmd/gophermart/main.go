@@ -17,14 +17,14 @@ import (
 )
 
 func main() {
-	// Загрузка конфига (расширь под ТЗ: RUN_ADDRESS, etc.)
+	// Загрузка конфига
 	cfg := gmconfig.NewConfig()
 	jwtSecret := "your-jwt-secret" // В prod из env
 
 	// DB setup
 	dbCfg := gmdb.NewDBConfig(*cfg)
 	dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		`localhost`, 5432, `postgres`, `123456`, `gophermart`) // Имя БД под ТЗ
+		`localhost`, 5432, `postgres`, `123456`, `shortener`)
 	db, err := gmdb.NewDataBase(*cfg, dbCfg)
 	if err != nil {
 		log.Fatal(err)
