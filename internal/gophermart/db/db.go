@@ -22,7 +22,6 @@ type Database struct {
 
 // NewDBConfig создает новую конфигурацию БД
 func NewDBConfig(c gmconfig.Config) DBConfig {
-	fmt.Println("Строка коннекта", c.DBurl)
 	return DBConfig{
 		DBurl: c.DBurl,
 	}
@@ -42,4 +41,20 @@ func NewDataBase(c gmconfig.Config, dbConf DBConfig) (*Database, error) {
 
 func (d *Database) Migrate() error {
 	return gmmigration.MigrateUp(d.DB)
+}
+
+// Close закрывает подключение к БД
+func (d *Database) Close() error {
+	if d.DB != nil {
+		return d.DB.Close()
+	}
+	return nil
+}
+
+func (d *Database) CreateUser(login, passwordHash string) (int64, error) {
+	query := `
+		INSERT INTO users (login, password_hash)
+		VALUES ($1, $2)
+		RETURNING id
+	`
 }
