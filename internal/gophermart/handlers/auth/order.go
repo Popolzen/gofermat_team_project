@@ -42,7 +42,7 @@ func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 		if err != nil {
 
 			switch {
-			case errors.Is(err, gmmodel.ErrOrderAlreadyExists): // 200 OK, если уже загружен пользователем (адаптируй имя ошибки, если ErrOrderAlreadyUploaded)
+			case errors.Is(err, gmmodel.ErrOrderAlreadyExists): // 200 OK, если уже загружен пользователем
 				w.WriteHeader(http.StatusOK)
 			case errors.Is(err, gmmodel.ErrOrderOwnedByOther): // 409
 				http.Error(w, "Order already uploaded by another user", http.StatusConflict)
@@ -71,7 +71,7 @@ func GetOrdersHandler(orderService gmservice.OrderService) http.HandlerFunc {
 
 		orders, err := orderService.GetList(r.Context(), userID)
 		if err != nil {
-			if errors.Is(err, gmmodel.ErrOrderNotFound) { // Или ErrNoOrders, если добавишь в model; для 204
+			if errors.Is(err, gmmodel.ErrOrderNotFound) { // 204
 				w.WriteHeader(http.StatusNoContent) // 204
 				return
 			}
