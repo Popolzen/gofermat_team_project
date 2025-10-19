@@ -41,8 +41,9 @@ func main() {
 	// Auth
 	auth := gmauth.NewAuth(jwtSecret)
 
-	// Services (UserService для register)
+	// Services
 	userService := gmservice.NewUserService(storage, auth)
+	userOrder := gmservice.NewOrderService(storage)
 
 	// Router
 	r := chi.NewRouter()
@@ -53,7 +54,11 @@ func main() {
 	r.Route("/api", func(api chi.Router) {
 		api.Route("/user", func(user chi.Router) {
 			user.Post("/register", gmhandlers.RegisterHandler(userService))
-			user.Post("/login", gmhandlers.LoginHandler(userService)) // Если есть, добавь
+			user.Post("/login", gmhandlers.LoginHandler(userService))
+		})
+		api.Route("/orders", func(user chi.Router) {
+			user.Post("/orders", gmhandlers.UploadHandler(userOrder))
+			user.Get("/orders", gmhandlers.GetOrdersHandler(userOrder))
 		})
 	})
 

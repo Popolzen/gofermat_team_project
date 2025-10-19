@@ -16,7 +16,6 @@ type UploadOrderRequest struct {
 }
 
 // UploadHandler handles uploading a new order number
-// Теперь без auth.AuthMiddleware внутри — оно применяется на роутере через .Use()
 func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -59,7 +58,6 @@ func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 }
 
 // GetOrdersHandler handles getting the list of user's orders
-// Аналогично, без middleware
 func GetOrdersHandler(orderService gmservice.OrderService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
