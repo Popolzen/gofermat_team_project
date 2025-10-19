@@ -41,7 +41,7 @@ func NewAuth(secretKey string) *Auth {
 // AuthMiddleware проверяет JWT токен в каждом запросе
 func (a *Auth) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Шаг 1: Читаем заголовок Authorization
+		// Читаем заголовок Authorization
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)

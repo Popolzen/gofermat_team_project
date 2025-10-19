@@ -49,6 +49,7 @@ func (s *userService) Login(ctx context.Context, login, password string) (string
 		return "", fmt.Errorf("login and password required")
 	}
 
+	// Получаем пользователя
 	user, err := s.storage.GetUserByLogin(ctx, login)
 	if err != nil {
 		if errors.Is(err, gmmodel.ErrUserNotFound) {
@@ -57,10 +58,12 @@ func (s *userService) Login(ctx context.Context, login, password string) (string
 		return "", err
 	}
 
+	// Проверяем пароль
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		return "", gmmodel.ErrUserNotFound
+		return "", gmmodel.ErrInvalidPassword
 	}
 
+	// Генерируем токен
 	token, err := gmauth.GenerateToken(user.ID, user.Login, s.auth.SecretKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate token: %w", err)

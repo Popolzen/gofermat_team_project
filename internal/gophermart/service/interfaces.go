@@ -36,3 +36,9 @@ type WithdrawalDTO struct {
 	Sum         float64
 	ProcessedAt time.Time
 }
+
+// OrderProcessor - интерфейс для фоновой обработки заказов (accrual API)
+type OrderProcessor interface {
+	Start(ctx context.Context) // Запуск горутины с обработкой
+	Stop()                     // Graceful shutdown
+}

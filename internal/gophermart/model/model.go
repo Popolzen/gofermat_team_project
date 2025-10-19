@@ -35,12 +35,15 @@ var (
 	// User errors
 	ErrUserNotFound       = errors.New("user not found")
 	ErrLoginAlreadyExists = errors.New("login already exists")
+	ErrInvalidPassword    = errors.New("invalid password")
 
 	// Order errors
-	ErrOrderNotFound      = errors.New("order not found")
-	ErrOrderAlreadyExists = errors.New("order already exists")
-	ErrOrderOwnedByOther  = errors.New("order owned by another user")
-	ErrInvalidOrderNumber = errors.New("invalid order number")
+	ErrOrderNotFound        = errors.New("order not found")
+	ErrOrderAlreadyExists   = errors.New("order already exists")
+	ErrOrderOwnedByOther    = errors.New("order owned by another user")
+	ErrInvalidOrderNumber   = errors.New("invalid order number")
+	ErrOrderAlreadyUploaded = errors.New("order already uploaded")
+	ErrNoOrders             = errors.New("no orders found")
 
 	// Balance errors
 	ErrInsufficientFunds = errors.New("insufficient funds")
