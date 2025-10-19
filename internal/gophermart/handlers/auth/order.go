@@ -18,10 +18,6 @@ type UploadOrderRequest struct {
 // UploadHandler handles uploading a new order number
 func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
 
 		// userID из ctx (AuthMiddleware уже добавил его)
 		userID := gmauth.MustGetUserID(r.Context())
@@ -39,7 +35,6 @@ func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 
 		err := orderService.Upload(r.Context(), userID, req.OrderNumber)
 		if err != nil {
-
 			switch {
 			case errors.Is(err, gmmodel.ErrOrderAlreadyExists): // 200 OK, если уже загружен пользователем
 				w.WriteHeader(http.StatusOK)

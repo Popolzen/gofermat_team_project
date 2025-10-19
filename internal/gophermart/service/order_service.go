@@ -40,7 +40,7 @@ func (s *orderService) Upload(ctx context.Context, userID int64, orderNumber str
 		// Проверяем кто загрузил
 		if existingOrder.UserID == userID {
 			// Тот же пользователь загружает повторно
-			return gmmodel.ErrOrderAlreadyUploaded // 200 OK
+			return gmmodel.ErrOrderAlreadyExists // 200 OK
 		} else {
 			// Другой пользователь уже загрузил
 			return gmmodel.ErrOrderOwnedByOther // 409 Conflict

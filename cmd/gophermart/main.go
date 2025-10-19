@@ -53,12 +53,17 @@ func main() {
 	// API routes
 	r.Route("/api", func(api chi.Router) {
 		api.Route("/user", func(user chi.Router) {
+			// Публичные роуты (без auth)
 			user.Post("/register", gmhandlers.RegisterHandler(userService))
 			user.Post("/login", gmhandlers.LoginHandler(userService))
-		})
-		api.Route("/orders", func(user chi.Router) {
-			user.Post("/orders", gmhandlers.UploadHandler(userOrder))
-			user.Get("/orders", gmhandlers.GetOrdersHandler(userOrder))
+
+			// Защищённые роуты (с auth middleware)
+			user.Group(func(protected chi.Router) {
+				protected.Use(auth.AuthMiddleware) // Применяем auth middleware ко всем роутам в группе
+				// Заказы
+				protected.Post("/orders", gmhandlers.UploadHandler(userOrder))
+				protected.Get("/orders", gmhandlers.GetOrdersHandler(userOrder))
+			})
 		})
 	})
 
