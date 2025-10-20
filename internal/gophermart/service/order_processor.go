@@ -2,10 +2,12 @@ package gmservice
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	gmmodel "github.com/Popolzen/gofermat_team/internal/gophermart/model"
 	gmstorage "github.com/Popolzen/gofermat_team/internal/gophermart/storage"
 )
 
@@ -36,4 +38,46 @@ func (o orderProcessor) Start(ctx context.Context) {
 
 func (o orderProcessor) Stop() {
 
+}
+
+func (o orderProcessor) processLoop(ctx context.Context) {
+	defer o.ticker.Stop()
+
+	select {
+	case <-o.ticker.C:
+		o.processBatch(ctx)
+	case <-ctx.Done():
+
+	case <-o.done:
+		return
+	}
+}
+
+func (o orderProcessor) processBatch(ctx context.Context) {
+
+	orders, err := o.storage.GetOrdersForProcessing(ctx)
+	if err != nil {
+		log.Printf("Failed to get orders for processing: %v", err)
+		return
+	}
+	if len(orders) == 0 {
+		return
+	}
+
+	var wg sync.WaitGroup
+
+	for _, order := range orders {
+		wg.Add(1)
+		go func(order *gmmodel.Order) {
+			defer wg.Done()
+
+			o.processOrder(ctx, order)
+		}(order)
+	}
+	wg.Wait()
+}
+
+func (o orderProcessor) processOrder(ctx context.Context, order *gmmodel.Order) {
+	// Процессируем заказ
+	//я устал
 }
