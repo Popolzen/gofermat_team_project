@@ -182,12 +182,12 @@ func (s *PostgresStorage) GetOrdersForProcessing(ctx context.Context) ([]*gmmode
 	query := `
 		SELECT id, user_id, order_number, status, accrual, uploaded_at
 		FROM orders
-		WHERE status = $1
+		WHERE status IN ('NEW', 'PROCESSING', 'REGISTERED')
 		FOR UPDATE SKIP LOCKED  -- To avoid concurrent processing
 		LIMIT 10
 	`
 
-	rows, err := s.db.QueryContext(ctx, query, gmmodel.OrderStatusNew)
+	rows, err := s.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get orders for processing: %w", err)
 	}

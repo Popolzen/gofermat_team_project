@@ -53,4 +53,5 @@ const (
 	OrderStatusProcessing = "PROCESSING"
 	OrderStatusInvalid    = "INVALID"
 	OrderStatusProcessed  = "PROCESSED"
+	OrderStatusRegistred  = "REGISTRED"
 )
