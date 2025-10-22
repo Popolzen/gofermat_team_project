@@ -65,7 +65,7 @@ func (o orderProcessor) processLoop(ctx context.Context) {
 
 }
 
-func (o orderProcessor) processBatch(ctx context.Context) {
+func (o *orderProcessor) processBatch(ctx context.Context) {
 
 	orders, err := o.storage.GetOrdersForProcessing(ctx)
 	if err != nil {
@@ -90,7 +90,7 @@ func (o orderProcessor) processBatch(ctx context.Context) {
 	wg.Wait()
 }
 
-func (o orderProcessor) processOrder(ctx context.Context, order *gmmodel.Order) {
+func (o *orderProcessor) processOrder(ctx context.Context, order *gmmodel.Order) {
 	// Процессируем заказ
 	//я устал
 	reqURL := fmt.Sprintf("%s/api/orders/%s", o.accrualURL, order.OrderNumber)
