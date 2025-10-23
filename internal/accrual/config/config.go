@@ -23,7 +23,7 @@ func NewConfig() *ServiceConfig {
 	}
 
 	var addrFlag, dsnFlag, logLevelFlag string
-	flag.StringVar(&addrFlag, "a", ":8080", "Server address and port (e.g., :8080)")
+	flag.StringVar(&addrFlag, "a", ":8081", "Server address and port (e.g., :8081)")
 	flag.StringVar(&dsnFlag, "d", "postgres://postgres:postgres@localhost:5432/loyalty?sslmode=disable", "Database DSN")
 	flag.StringVar(&logLevelFlag, "l", "info", "Log level (debug, info, warn, error)")
 	flag.Parse()
