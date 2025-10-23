@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,8 +27,8 @@ func main() {
 
 	// DB setup
 	dbCfg := gmdb.NewDBConfig(*cfg)
-	dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		`localhost`, 5432, `postgres`, `123456`, `shortener`)
+	// dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	// 	`localhost`, 5432, `postgres`, `123456`, `shortener`)
 	db, err := gmdb.NewDataBase(*cfg, dbCfg)
 	if err != nil {
 		log.Fatal(err)
