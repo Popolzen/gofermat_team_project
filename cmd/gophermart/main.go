@@ -48,10 +48,11 @@ func main() {
 
 	// Services
 	userService := gmservice.NewUserService(storage, auth)
-	userOrder := gmservice.NewOrderService(storage)
+	orderService := gmservice.NewOrderService(storage)
+	balanceService := gmservice.NewBalanceService(storage, storage) // ← добавил
 
-	// OrderProcessor для опроса и обновления заказов
-	accrualURL := "http://localhost:8081" // поменяй меня!!! cfg.AccrualURL
+	// OrderProcessor
+	accrualURL := "http://localhost:8081"
 	processor := gmservice.NewOrderProcessor(storage, accrualURL)
 
 	// Контекст для graceful shutdown
@@ -69,16 +70,22 @@ func main() {
 	// API routes
 	r.Route("/api", func(api chi.Router) {
 		api.Route("/user", func(user chi.Router) {
-			// Публичные роуты (без auth)
+			// Публичные
 			user.Post("/register", gmhandlers.RegisterHandler(userService))
 			user.Post("/login", gmhandlers.LoginHandler(userService))
 
-			// Защищённые роуты (с auth middleware)
+			// Защищённые
 			user.Group(func(protected chi.Router) {
-				protected.Use(auth.AuthMiddleware) // Применяем auth middleware ко всем роутам в группе
+				protected.Use(auth.AuthMiddleware)
+
 				// Заказы
-				protected.Post("/orders", gmhandlers.UploadHandler(userOrder))
-				protected.Get("/orders", gmhandlers.GetOrdersHandler(userOrder))
+				protected.Post("/orders", gmhandlers.UploadHandler(orderService))
+				protected.Get("/orders", gmhandlers.GetOrdersHandler(orderService))
+
+				// Баланс
+				protected.Get("/balance", gmhandlers.GetBalanceHandler(balanceService))
+				protected.Post("/balance/withdraw", gmhandlers.WithdrawHandler(balanceService))
+				protected.Get("/withdrawals", gmhandlers.GetWithdrawalsHandler(balanceService))
 			})
 		})
 	})
@@ -88,7 +95,7 @@ func main() {
 		w.Write([]byte("Gophermart API running"))
 	})
 
-	// Запуск сервера
+	// Server
 	srv := &http.Server{
 		Addr:         cfg.ServerAddr,
 		Handler:      r,

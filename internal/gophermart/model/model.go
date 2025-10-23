@@ -45,7 +45,9 @@ var (
 	ErrNoOrders           = errors.New("no orders found")
 
 	// Balance errors
-	ErrInsufficientFunds = errors.New("insufficient funds")
+	ErrInsufficientFunds     = errors.New("insufficient funds")
+	ErrInvalidWithdrawAmount = errors.New("invalid withdraw amount")
+	ErrNoWithdrawals         = errors.New("no withdrawals found")
 )
 
 const (
