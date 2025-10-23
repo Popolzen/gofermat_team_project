@@ -23,3 +23,11 @@ vendor/
 # IDEs directories
 .idea
 .vscode
+
+async_test.sh
+docker-compose.yml
+Dockerfile
+seed_all_tables.sh
+test_goods_reeward.sh
+test_order_registration.sh
+test_rate_limit.sh
