@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,11 +25,13 @@ func main() {
 	// Загрузка конфига
 	cfg := gmconfig.NewConfig()
 	jwtSecret := "your-jwt-secret" // В prod из env
+	fmt.Println(cfg)
 
 	// DB setup
 	dbCfg := gmdb.NewDBConfig(*cfg)
-	// dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-	// 	`localhost`, 5432, `postgres`, `123456`, `shortener`)
+	dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		`localhost`, 5432, `postgres`, `123456`, `shortener`)
+	fmt.Print(dbCfg)
 	db, err := gmdb.NewDataBase(*cfg, dbCfg)
 	if err != nil {
 		log.Fatal(err)
