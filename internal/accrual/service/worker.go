@@ -55,52 +55,6 @@ func NewOrderProcessor(repo repository.AccrualRepository, logger *logger.Logger,
 	return processor
 }
 
-//func (p *OrderProcessor) SubmitOrder(ctx context.Context, orderReq *model.OrderRequest) error {
-//	p.mu.RLock()
-//	defer p.mu.RUnlock()
-//
-//	if p.isStopped {
-//		return errors.New("processor is stopped")
-//	}
-//
-//	job := &processJob{
-//		orderReq: orderReq,
-//		ctx:      ctx,
-//	}
-//
-//	select {
-//	case p.jobQueue <- job:
-//		p.logger.Debug("Order submitted for processing", zap.String("order", orderReq.Order))
-//		return nil
-//	case <-p.stopChan:
-//		return errors.New("processor is stopped")
-//	default:
-//		p.logger.Warn("Order queue is full", zap.String("order", orderReq.Order))
-//		return errors.New("order queue is full")
-//	}
-//}
-//
-//func (p *OrderProcessor) worker(id int) {
-//	defer p.wg.Done()
-//
-//	p.logger.Info("Worker started", zap.Int("worker", id))
-//
-//	for {
-//		select {
-//		case job, ok := <-p.jobQueue:
-//			if !ok {
-//				p.logger.Info("Worker stopping", zap.Int("worker", id))
-//				return
-//			}
-//			p.processOrder(job.ctx, id, job.orderReq)
-//
-//		case <-p.stopChan:
-//			p.logger.Info("Worker received stop signal", zap.Int("worker", id))
-//			return
-//		}
-//	}
-//}
-
 func (p *OrderProcessor) SubmitOrder(ctx context.Context, orderReq *model.OrderRequest) error {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
