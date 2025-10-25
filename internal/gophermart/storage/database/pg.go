@@ -221,12 +221,23 @@ func (s *PostgresStorage) GetOrdersForProcessing(ctx context.Context) ([]*gmmode
 func (s *PostgresStorage) GetUserBalance(ctx context.Context, userID int64) (*gmmodel.Balance, error) {
 	query := `
 		SELECT 
-			COALESCE(SUM(CASE WHEN o.status = $2 THEN COALESCE(o.accrual, 0) ELSE 0 END), 0) AS current,
-			COALESCE(SUM(w.sum), 0) AS withdrawn
-		FROM orders o
-		LEFT JOIN withdrawals w ON o.user_id = w.user_id
-		WHERE o.user_id = $1
-		GROUP BY o.user_id
+			COALESCE(
+				(SELECT SUM(accrual) 
+				 FROM orders 
+				 WHERE user_id = $1 AND status = $2 AND accrual IS NOT NULL), 
+				0
+			) - COALESCE(
+				(SELECT SUM(sum) 
+				 FROM withdrawals 
+				 WHERE user_id = $1), 
+				0
+			) as current,
+			COALESCE(
+				(SELECT SUM(sum) 
+				 FROM withdrawals 
+				 WHERE user_id = $1), 
+				0
+			) as withdrawn
 	`
 
 	balance := &gmmodel.Balance{}
@@ -234,9 +245,9 @@ func (s *PostgresStorage) GetUserBalance(ctx context.Context, userID int64) (*gm
 		&balance.Current,
 		&balance.Withdrawn,
 	)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// No orders/withdrawals, return zero balance
 			return &gmmodel.Balance{Current: 0, Withdrawn: 0}, nil
 		}
 		return nil, fmt.Errorf("failed to get user balance: %w", err)

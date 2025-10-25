@@ -3,47 +3,53 @@ package gmhandlers
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
+	"strings"
 
 	gmauth "github.com/Popolzen/gofermat_team/internal/gophermart/middleware/auth"
 	gmmodel "github.com/Popolzen/gofermat_team/internal/gophermart/model"
 	gmservice "github.com/Popolzen/gofermat_team/internal/gophermart/service"
 )
 
-// UploadOrderRequest represents the request body for uploading an order
-type UploadOrderRequest struct {
-	OrderNumber string `json:"order"`
-}
-
-// UploadHandler handles uploading a new order number
+// UploadHandler обрабатывает загрузку нового номера заказа
 func UploadHandler(orderService gmservice.OrderService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Проверяем Content-Type
+		if r.Header.Get("Content-Type") != "text/plain" {
+			http.Error(w, "Content-Type must be text/plain", http.StatusBadRequest)
+			return
+		}
 
-		// userID из ctx (AuthMiddleware уже добавил его)
+		// Получаем userID из контекста
 		userID := gmauth.MustGetUserID(r.Context())
 
-		var req UploadOrderRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		// Читаем тело запроса
+		body, err := io.ReadAll(r.Body)
+		if err != nil || len(body) == 0 {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
+		orderNumber := strings.TrimSpace(string(body))
 
-		if req.OrderNumber == "" {
-			http.Error(w, "Order number is required", http.StatusBadRequest)
+		// Проверяем валидность номера заказа по алгоритму Луна
+		if !isValidLuhn(orderNumber) {
+			http.Error(w, "Invalid order number", http.StatusUnprocessableEntity)
 			return
 		}
 
-		err := orderService.Upload(r.Context(), userID, req.OrderNumber)
+		// Вызываем сервис для загрузки заказа
+		err = orderService.Upload(r.Context(), userID, orderNumber)
 		if err != nil {
 			switch {
-			case errors.Is(err, gmmodel.ErrOrderAlreadyExists): // 200 OK, если уже загружен пользователем
-				w.WriteHeader(http.StatusOK)
-			case errors.Is(err, gmmodel.ErrOrderOwnedByOther): // 409
-				http.Error(w, "Order already uploaded by another user", http.StatusConflict)
-			case errors.Is(err, gmmodel.ErrInvalidOrderNumber): // 422
-				http.Error(w, "Invalid order number", http.StatusUnprocessableEntity)
+			case errors.Is(err, gmmodel.ErrOrderAlreadyExists):
+				w.WriteHeader(http.StatusOK) // 200 для повторной загрузки тем же пользователем
+			case errors.Is(err, gmmodel.ErrOrderOwnedByOther):
+				http.Error(w, "Order already uploaded by another user", http.StatusConflict) // 409
+			case errors.Is(err, gmmodel.ErrInvalidOrderNumber):
+				http.Error(w, "Invalid order number", http.StatusUnprocessableEntity) // 422
 			default:
-				http.Error(w, "Failed to upload order", http.StatusInternalServerError)
+				http.Error(w, "Failed to upload order", http.StatusInternalServerError) // 500
 			}
 			return
 		}
@@ -78,4 +84,24 @@ func GetOrdersHandler(orderService gmservice.OrderService) http.HandlerFunc {
 			return
 		}
 	}
+}
+
+func isValidLuhn(number string) bool {
+	var sum int
+	alt := false
+	for i := len(number) - 1; i >= 0; i-- {
+		digit := int(number[i] - '0')
+		if digit < 0 || digit > 9 {
+			return false // Номер должен содержать только цифры
+		}
+		if alt {
+			digit *= 2
+			if digit > 9 {
+				digit -= 9
+			}
+		}
+		sum += digit
+		alt = !alt
+	}
+	return sum%10 == 0
 }

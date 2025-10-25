@@ -24,8 +24,6 @@ import (
 func main() {
 	// Загрузка конфига
 	cfg := gmconfig.NewConfig()
-	jwtSecret := "your-jwt-secret" // В prod из env
-	fmt.Println(cfg)
 
 	// DB setup
 	dbCfg := gmdb.NewDBConfig(*cfg)
@@ -46,7 +44,7 @@ func main() {
 	storage := gmstorage.NewPostgresStorage(db.DB)
 
 	// Auth
-	auth := gmauth.NewAuth(jwtSecret)
+	auth := gmauth.NewAuth(cfg.SecretKey)
 
 	// Services
 	userService := gmservice.NewUserService(storage, auth)
@@ -54,8 +52,7 @@ func main() {
 	balanceService := gmservice.NewBalanceService(storage, storage) // ← добавил
 
 	// OrderProcessor
-	accrualURL := "http://localhost:8081"
-	processor := gmservice.NewOrderProcessor(storage, accrualURL)
+	processor := gmservice.NewOrderProcessor(storage, cfg.AcServerAddr)
 
 	// Контекст для graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())

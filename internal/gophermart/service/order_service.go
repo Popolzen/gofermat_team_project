@@ -23,10 +23,6 @@ func NewOrderService(storage gmstorage.OrderStorage) OrderService {
 
 // Upload загружает новый номер заказа для пользователя
 func (s *orderService) Upload(ctx context.Context, userID int64, orderNumber string) error {
-	// Проверяем номер заказа алгоритмом Луна
-	// if !utils.ValidateOrderNumber(orderNumber) {
-	// 	return gmmodel.ErrInvalidOrderNumber
-	// }
 
 	// Проверяем существует ли уже такой заказ
 	existingOrder, err := s.storage.GetOrderByNumber(ctx, orderNumber)
