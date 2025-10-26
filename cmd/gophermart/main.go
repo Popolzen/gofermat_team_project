@@ -27,8 +27,7 @@ func main() {
 
 	// DB setup
 	dbCfg := gmdb.NewDBConfig(*cfg)
-	dbCfg.DBurl = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		`localhost`, 5432, `postgres`, `123456`, `shortener`)
+
 	fmt.Print(dbCfg)
 	db, err := gmdb.NewDataBase(*cfg, dbCfg)
 	if err != nil {
